@@ -86,7 +86,12 @@ BasicHashTable *create_hash_table(int capacity)
  ****/
 void hash_table_insert(BasicHashTable *ht, char *key, char *value)
 {
-
+  // hash the key to figure out the index where the pair will be placed
+  int index = hash(key, ht->capacity); 
+  // Create the pair using the passed in key and value
+  Pair *pair = create_pair(key, value); 
+  // Place the pair at the hashed index
+  ht->storage[index];
 }
 
 /****
@@ -132,9 +137,9 @@ int main(void)
 {
   struct BasicHashTable *ht = create_hash_table(16);
 
-  // hash_table_insert(ht, "line", "Here today...\n");
+  hash_table_insert(ht, "line", "Here today...\n");
 
-  // printf("%s", hash_table_retrieve(ht, "line"));
+  printf("%s", hash_table_retrieve(ht, "line"));
 
   // hash_table_remove(ht, "line");
 
