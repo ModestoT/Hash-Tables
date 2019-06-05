@@ -91,7 +91,7 @@ void hash_table_insert(BasicHashTable *ht, char *key, char *value)
   // Create the pair using the passed in key and value
   Pair *pair = create_pair(key, value); 
   // Place the pair at the hashed index
-  ht->storage[index];
+  ht->storage[index] = pair;
 }
 
 /****
@@ -111,6 +111,17 @@ void hash_table_remove(BasicHashTable *ht, char *key)
  ****/
 char *hash_table_retrieve(BasicHashTable *ht, char *key)
 {
+  // hash the passed in key to be used to check the storage for a value
+  int lookupIndex = hash(key, ht->capacity);
+  // then check to see if that index is NULL or not
+  if (ht->storage[lookupIndex] != NULL){
+    // if it's not null compare that index's key string to the passed in key string
+    if (strcmp(ht->storage[lookupIndex]->key, key) == 0){
+      // if strings are the same return the value for the key
+      return ht->storage[lookupIndex]->value;
+    } 
+  }
+  
   return NULL;
 }
 
