@@ -89,7 +89,11 @@ void hash_table_insert(BasicHashTable *ht, char *key, char *value)
   // hash the key to figure out the index where the pair will be placed
   int index = hash(key, ht->capacity); 
   // Create the pair using the passed in key and value
-  Pair *pair = create_pair(key, value); 
+  Pair *pair = create_pair(key, value);
+
+  if (ht->storage[index] != NULL){
+    printf("Warning overwriting value at this index\n");
+  } 
   // Place the pair at the hashed index
   ht->storage[index] = pair;
 }
@@ -101,7 +105,13 @@ void hash_table_insert(BasicHashTable *ht, char *key, char *value)
  ****/
 void hash_table_remove(BasicHashTable *ht, char *key)
 {
-
+  int index = hash(key, ht->capacity);
+  // check if the key being removed is valid
+  if (ht->storage[index] == NULL){
+    fprintf(stderr, "Key not found\n");
+    return;
+  }
+  destroy_pair(ht->storage[index]);
 }
 
 /****
@@ -152,13 +162,13 @@ int main(void)
 
   printf("%s", hash_table_retrieve(ht, "line"));
 
-  // hash_table_remove(ht, "line");
+  hash_table_remove(ht, "line");
 
-  // if (hash_table_retrieve(ht, "line") == NULL) {
-  //   printf("...gone tomorrow. (success)\n");
-  // } else {
-  //   fprintf(stderr, "ERROR: STILL HERE\n");
-  // }
+  if (hash_table_retrieve(ht, "line") == NULL) {
+    printf("...gone tomorrow. (success)\n");
+  } else {
+    fprintf(stderr, "ERROR: STILL HERE\n");
+  }
 
   destroy_hash_table(ht);
 
