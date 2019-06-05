@@ -147,7 +147,7 @@ void destroy_hash_table(BasicHashTable *ht)
     destroy_pair(ht->storage[i]);
   }
 
-  // Free the hasttable
+  // Free the hash table
   free(ht->storage);
   free(ht);
 }

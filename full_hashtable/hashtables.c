@@ -73,7 +73,11 @@ unsigned int hash(char *str, int max)
  */
 HashTable *create_hash_table(int capacity)
 {
-  HashTable *ht;
+  HashTable *ht = malloc(sizeof(HashTable));
+
+  // initialized all values in the storage as NULL using calloc()
+  ht->storage = calloc(capacity, sizeof(LinkedPair *)); 
+  ht->capacity = capacity; 
 
   return ht;
 }
@@ -89,7 +93,28 @@ HashTable *create_hash_table(int capacity)
  */
 void hash_table_insert(HashTable *ht, char *key, char *value)
 {
-
+  // hash the key to see which bucket the key value pair will be placed into
+  int index = hash(key, ht->capacity);
+  // check if the bucket is NULL or not
+  if(ht->storage[index] != NULL){
+    // if it is not NULL we then need to check if the key is the same or not
+    if(strcmp(ht->storage[index]-> key, key) == 0){
+      // if strcmp returns 0 the keys are the same string
+      // which means we can overwrite the value at this index
+      ht->storage[index]->value = value;
+    } else {
+      // else the keys are different and it should be added to the linked list at that index
+      LinkedPair *pair = create_pair(key, value);
+      if (ht->storage[index]->next == NULL){
+        ht->storage[index]->next = pair;
+      } else {
+        
+        while(->next !=NULL){
+          printf("Value: %s\n", ht->storage[index])
+        }
+      }
+    }
+  }
 }
 
 /*
