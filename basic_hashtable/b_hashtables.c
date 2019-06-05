@@ -71,7 +71,7 @@ unsigned int hash(char *str, int max)
 BasicHashTable *create_hash_table(int capacity)
 {
   BasicHashTable *ht = malloc(sizeof(BasicHashTable));
-  ht->storage = calloc(capacity, sizeof(Pair *));
+  ht->storage = calloc(capacity, sizeof(Pair *)); // initialized all values in the storage as NULL using calloc()
   ht->capacity = capacity; 
 
   return ht;
@@ -116,7 +116,14 @@ char *hash_table_retrieve(BasicHashTable *ht, char *key)
  ****/
 void destroy_hash_table(BasicHashTable *ht)
 {
+  // Free all the pairs in the storage
+  for (int i = 0; i < ht->capacity; i++){
+    destroy_pair(ht->storage[i]);
+  }
 
+  // Free the hasttable
+  free(ht->storage);
+  free(ht);
 }
 
 
@@ -125,17 +132,17 @@ int main(void)
 {
   struct BasicHashTable *ht = create_hash_table(16);
 
-  hash_table_insert(ht, "line", "Here today...\n");
+  // hash_table_insert(ht, "line", "Here today...\n");
 
-  printf("%s", hash_table_retrieve(ht, "line"));
+  // printf("%s", hash_table_retrieve(ht, "line"));
 
-  hash_table_remove(ht, "line");
+  // hash_table_remove(ht, "line");
 
-  if (hash_table_retrieve(ht, "line") == NULL) {
-    printf("...gone tomorrow. (success)\n");
-  } else {
-    fprintf(stderr, "ERROR: STILL HERE\n");
-  }
+  // if (hash_table_retrieve(ht, "line") == NULL) {
+  //   printf("...gone tomorrow. (success)\n");
+  // } else {
+  //   fprintf(stderr, "ERROR: STILL HERE\n");
+  // }
 
   destroy_hash_table(ht);
 
