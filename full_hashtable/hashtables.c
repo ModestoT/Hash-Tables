@@ -111,9 +111,13 @@ void hash_table_insert(HashTable *ht, char *key, char *value)
         LinkedPair *trav = ht->storage[index]->next;
         while(trav !=NULL){
           printf("Value: %s\n", trav->value);
+          if (trav->next == NULL){
+            printf("Next value is null\n");
+            trav->next = pair;
+            break;
+          }
           trav = trav->next;
         }
-        trav->next = pair;
       }
     } 
   } else {
@@ -182,7 +186,8 @@ int main(void)
   hash_table_insert(ht, "line_1", "Tiny hash table\n");
   hash_table_insert(ht, "line_2", "Filled beyond capacity\n");
   hash_table_insert(ht, "line_3", "Linked list saves the day!\n");
-
+  hash_table_insert(ht, "line_12", "Linked list saves the day!\n");
+  hash_table_insert(ht, "line_4", "Linked list saves the day!\n");
   // printf("%s", hash_table_retrieve(ht, "line_1"));
   // printf("%s", hash_table_retrieve(ht, "line_2"));
   // printf("%s", hash_table_retrieve(ht, "line_3"));
