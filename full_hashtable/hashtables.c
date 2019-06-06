@@ -114,6 +114,10 @@ void hash_table_insert(HashTable *ht, char *key, char *value)
         LinkedPair *nextPair = ht->storage[index]->next;
         while(nextPair !=NULL){
           printf("Value: %s\n", nextPair->value);
+          if (strcmp(nextPair->key, key) == 0){
+            nextPair->value = value;
+            break;
+          }
           if (nextPair->next == NULL){
             printf("Next value is null\n");
             nextPair->next = pair;
