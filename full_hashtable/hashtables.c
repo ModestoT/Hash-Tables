@@ -144,7 +144,40 @@ void hash_table_insert(HashTable *ht, char *key, char *value)
  */
 void hash_table_remove(HashTable *ht, char *key)
 {
+  // hash the passed in key to see which index we need to check
+  int lookUpIndex = hash(key, ht->capacity);
 
+  // check that index to see if it's NULL or not
+  if(ht->storage[lookUpIndex] != NULL){
+    // if it's not NULL see if the key is the same as the passed in key
+    if(strcmp(ht->storage[lookUpIndex]->key, key) == 0){
+      destroy_pair(ht->storage[lookUpIndex]);
+      ht->storage[lookUpIndex] = NULL;
+      return;
+    // else if it's not the same key check if there is a linked Pair
+    } else if(ht->storage[lookUpIndex]->next == NULL){
+      //if there's not return NULL
+      fprintf(stderr, "Unable to find key: %s \n", key);
+      return;
+    } else {
+      // if the index pair has something in next, loop through the linked list to find the key
+      LinkedPair *currentPair = ht->storage[lookUpIndex];
+      LinkedPair *nextPair = currentPair->next;
+     
+      while(nextPair != NULL){
+        if (strcmp(nextPair->key, key) == 0){
+          // if the next pair is the correct key set the previous pair's next value as the nextPairs next value
+          currentPair->next = nextPair->next;
+          destroy_pair(nextPair);
+          return;
+        }
+        nextPair = nextPair->next;
+      }
+    }
+  } 
+  // else couldn't find the key return NULL
+  fprintf(stderr, "Unable to find key: %s\n", key);
+  return;
 }
 
 /*
@@ -172,7 +205,7 @@ char *hash_table_retrieve(HashTable *ht, char *key)
       fprintf(stderr, "Unable to find key: %s \n", key);
       return NULL;
     } else {
-      // if the index pair has something in next loop through the linked list to find the key
+      // if the index pair has something in next, loop through the linked list to find the key
       LinkedPair *nextPair = ht->storage[lookUpIndex]->next;
      
       while(nextPair != NULL){
@@ -244,6 +277,7 @@ int main(void)
   hash_table_insert(ht, "key-7", "val-7");
   hash_table_insert(ht, "key-8", "val-8");
   hash_table_insert(ht, "key-9", "val-9");
+  hash_table_remove(ht, "key-9");
   // printf("found:%s\n", hash_table_retrieve(ht, "key-0"));
   // printf("%s\n", hash_table_retrieve(ht, "key-1"));
   // printf("%s\n", hash_table_retrieve(ht, "key-2"));
@@ -253,7 +287,7 @@ int main(void)
   // printf("found:%s\n", hash_table_retrieve(ht, "key-6"));
   // printf("%s\n", hash_table_retrieve(ht, "key-7"));
   // printf("%s\n", hash_table_retrieve(ht, "key-8"));
-  // printf("%s\n", hash_table_retrieve(ht, "key-9"));
+  printf("%s\n", hash_table_retrieve(ht, "key-9"));
 
   // int old_capacity = ht->capacity;
   // ht = hash_table_resize(ht);
