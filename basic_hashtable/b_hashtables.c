@@ -70,7 +70,9 @@ unsigned int hash(char *str, int max)
  ****/
 BasicHashTable *create_hash_table(int capacity)
 {
-  BasicHashTable *ht;
+  BasicHashTable *ht = malloc(sizeof(BasicHashTable));
+  ht->storage = calloc(capacity, sizeof(Pair *)); // initialized all values in the storage as NULL using calloc()
+  ht->capacity = capacity; 
 
   return ht;
 }
@@ -84,7 +86,20 @@ BasicHashTable *create_hash_table(int capacity)
  ****/
 void hash_table_insert(BasicHashTable *ht, char *key, char *value)
 {
+  // hash the key to figure out the index where the pair will be placed
+  int index = hash(key, ht->capacity); 
+  // Create the pair using the passed in key and value
+  Pair *pair = create_pair(key, value);
 
+  Pair *stored_pair = ht->storage[index];
+  if (stored_pair != NULL){
+    if(strcmp(key, stored_pair->key) != 0){
+      printf("Warning overwriting value at this index\n");
+    }
+    destroy_pair(stored_pair);
+  } 
+  // Place the pair at the hashed index
+  ht->storage[index] = pair;
 }
 
 /****
@@ -94,7 +109,14 @@ void hash_table_insert(BasicHashTable *ht, char *key, char *value)
  ****/
 void hash_table_remove(BasicHashTable *ht, char *key)
 {
-
+  int index = hash(key, ht->capacity);
+  // check if the key being removed is valid
+  if (ht->storage[index] == NULL || strcmp(ht->storage[index]->key, key) != 0){
+    fprintf(stderr, "Key not found\n");
+    return;
+  }
+  destroy_pair(ht->storage[index]);
+  ht->storage[index] = NULL;
 }
 
 /****
@@ -104,6 +126,15 @@ void hash_table_remove(BasicHashTable *ht, char *key)
  ****/
 char *hash_table_retrieve(BasicHashTable *ht, char *key)
 {
+  // hash the passed in key to be used to check the storage for a value
+  int lookupIndex = hash(key, ht->capacity);
+  // then check to see if that index is NULL or not
+  if (ht->storage[lookupIndex] != NULL && strcmp(ht->storage[lookupIndex]->key, key) == 0){
+    // if it's not null compare that index's key string to the passed in key string
+    // if strings are the same return the value for the key
+    return ht->storage[lookupIndex]->value;
+  }
+  fprintf(stderr, "Unable to find key");
   return NULL;
 }
 
@@ -114,7 +145,14 @@ char *hash_table_retrieve(BasicHashTable *ht, char *key)
  ****/
 void destroy_hash_table(BasicHashTable *ht)
 {
+  // Free all the pairs in the storage
+  for (int i = 0; i < ht->capacity; i++){
+    destroy_pair(ht->storage[i]);
+  }
 
+  // Free the hash table
+  free(ht->storage);
+  free(ht);
 }
 
 
