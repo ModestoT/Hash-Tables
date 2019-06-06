@@ -91,8 +91,12 @@ void hash_table_insert(BasicHashTable *ht, char *key, char *value)
   // Create the pair using the passed in key and value
   Pair *pair = create_pair(key, value);
 
-  if (ht->storage[index] != NULL){
-    printf("Warning overwriting value at this index\n");
+  Pair *stored_pair = ht->storage[index];
+  if (stored_pair != NULL){
+    if(strcmp(key, stored_pair->key) != 0){
+      printf("Warning overwriting value at this index\n");
+    }
+    destroy_pair(stored_pair);
   } 
   // Place the pair at the hashed index
   ht->storage[index] = pair;
@@ -107,11 +111,12 @@ void hash_table_remove(BasicHashTable *ht, char *key)
 {
   int index = hash(key, ht->capacity);
   // check if the key being removed is valid
-  if (ht->storage[index] == NULL){
+  if (ht->storage[index] == NULL || strcmp(ht->storage[index]->key, key) != 0){
     fprintf(stderr, "Key not found\n");
     return;
   }
   destroy_pair(ht->storage[index]);
+  ht->storage[index] = NULL;
 }
 
 /****
@@ -124,14 +129,12 @@ char *hash_table_retrieve(BasicHashTable *ht, char *key)
   // hash the passed in key to be used to check the storage for a value
   int lookupIndex = hash(key, ht->capacity);
   // then check to see if that index is NULL or not
-  if (ht->storage[lookupIndex] != NULL){
+  if (ht->storage[lookupIndex] != NULL && strcmp(ht->storage[lookupIndex]->key, key) == 0){
     // if it's not null compare that index's key string to the passed in key string
-    if (strcmp(ht->storage[lookupIndex]->key, key) == 0){
-      // if strings are the same return the value for the key
-      return ht->storage[lookupIndex]->value;
-    } 
+    // if strings are the same return the value for the key
+    return ht->storage[lookupIndex]->value;
   }
-  
+  fprintf(stderr, "Unable to find key");
   return NULL;
 }
 

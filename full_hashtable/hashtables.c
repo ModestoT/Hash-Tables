@@ -105,18 +105,21 @@ void hash_table_insert(HashTable *ht, char *key, char *value)
     } else {
       // else the keys are different and it should be added to the linked list at that index
       LinkedPair *pair = create_pair(key, value);
+      // check if there is a linked list already established at this bucket
+      // if not add the new pair to the linked list at this bucket
       if (ht->storage[index]->next == NULL){
         ht->storage[index]->next = pair;
+      // else travel through the linked list until you get to a empty spot
       } else {
-        LinkedPair *trav = ht->storage[index]->next;
-        while(trav !=NULL){
-          printf("Value: %s\n", trav->value);
-          if (trav->next == NULL){
+        LinkedPair *nextPair = ht->storage[index]->next;
+        while(nextPair !=NULL){
+          printf("Value: %s\n", nextPair->value);
+          if (nextPair->next == NULL){
             printf("Next value is null\n");
-            trav->next = pair;
+            nextPair->next = pair;
             break;
           }
-          trav = trav->next;
+          nextPair = nextPair->next;
         }
       }
     } 
@@ -149,6 +152,34 @@ void hash_table_remove(HashTable *ht, char *key)
  */
 char *hash_table_retrieve(HashTable *ht, char *key)
 {
+  // hash the passed in key to see which index we need to check
+  int lookUpIndex = hash(key, ht->capacity);
+
+  // check that index to see if it's NULL or not
+  if(ht->storage[lookUpIndex] != NULL){
+    // if it's not NULL see if the key is the same as the passed in key
+    if(strcmp(ht->storage[lookUpIndex]->key, key) == 0){
+      return ht->storage[lookUpIndex]->value;
+
+    // else if it's not the same key check if there is a linked Pair
+    } else if(ht->storage[lookUpIndex]->next == NULL){
+      //if there's not return NULL
+      fprintf(stderr, "Unable to find key: %s \n", key);
+      return NULL;
+    } else {
+      // if the index pair has something in next loop through the linked list to find the key
+      LinkedPair *nextPair = ht->storage[lookUpIndex]->next;
+     
+      while(nextPair != NULL){
+        if (strcmp(nextPair->key, key) == 0){
+          return nextPair->value;
+        }
+        nextPair = nextPair->next;
+      }
+    }
+  } 
+  // else couldn't find the key return NULL
+  fprintf(stderr, "Unable to find key: %s\n", key);
   return NULL;
 }
 
@@ -181,16 +212,28 @@ HashTable *hash_table_resize(HashTable *ht)
 #ifndef TESTING
 int main(void)
 {
-  struct HashTable *ht = create_hash_table(2);
+  struct HashTable *ht = create_hash_table(8);
 
-  hash_table_insert(ht, "line_1", "Tiny hash table\n");
-  hash_table_insert(ht, "line_2", "Filled beyond capacity\n");
-  hash_table_insert(ht, "line_3", "Linked list saves the day!\n");
-  hash_table_insert(ht, "line_12", "Linked list saves the day!\n");
-  hash_table_insert(ht, "line_4", "Linked list saves the day!\n");
-  // printf("%s", hash_table_retrieve(ht, "line_1"));
-  // printf("%s", hash_table_retrieve(ht, "line_2"));
-  // printf("%s", hash_table_retrieve(ht, "line_3"));
+  hash_table_insert(ht, "key-0", "val-0");
+  hash_table_insert(ht, "key-1", "val-1");
+  hash_table_insert(ht, "key-2", "val-2");
+  hash_table_insert(ht, "key-3", "val-3");
+  hash_table_insert(ht, "key-4", "val-4");
+  hash_table_insert(ht, "key-5", "val-5");
+  hash_table_insert(ht, "key-6", "val-6");
+  hash_table_insert(ht, "key-7", "val-7");
+  hash_table_insert(ht, "key-8", "val-8");
+  hash_table_insert(ht, "key-9", "val-9");
+  printf("found:%s\n", hash_table_retrieve(ht, "key-0"));
+  printf("%s\n", hash_table_retrieve(ht, "key-1"));
+  printf("%s\n", hash_table_retrieve(ht, "key-2"));
+  printf("found:%s\n", hash_table_retrieve(ht, "key-3"));
+  printf("%s\n", hash_table_retrieve(ht, "key-4"));
+  printf("%s\n", hash_table_retrieve(ht, "key-5"));
+  printf("found:%s\n", hash_table_retrieve(ht, "key-6"));
+  printf("%s\n", hash_table_retrieve(ht, "key-7"));
+  printf("%s\n", hash_table_retrieve(ht, "key-8"));
+  printf("%s\n", hash_table_retrieve(ht, "key-9"));
 
   // int old_capacity = ht->capacity;
   // ht = hash_table_resize(ht);
