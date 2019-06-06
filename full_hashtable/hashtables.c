@@ -230,17 +230,20 @@ void destroy_hash_table(HashTable *ht)
 {
   // free all the linked pairs in storage
   for (int i = 0; i < ht->capacity; i++){
-    LinkedPair *nextPair = ht->storage[i]->next;
-    if(nextPair != NULL){
-      LinkedPair *temp = nextPair;
-      while(nextPair != NULL){
-        destroy_pair(nextPair);
-        nextPair = temp->next;
+    if(ht->storage[i] != NULL){
+      LinkedPair *nextPair = ht->storage[i]->next;
+      if(nextPair != NULL){
+        LinkedPair *temp = nextPair;
+        while(nextPair != NULL){
+          printf("next pair destroyed: %s\n", nextPair->key);
+          destroy_pair(nextPair);
+          nextPair = temp->next;
+        }
       }
+      printf("pair destroyed: %s\n", ht->storage[i]->key);
+      destroy_pair(ht->storage[i]);
     }
-    destroy_pair(ht->storage[i]);
   }
-
   // free the hash table
   free(ht->storage);
   free(ht);
@@ -317,6 +320,10 @@ int main(void)
   int old_capacity = ht->capacity;
   ht = hash_table_resize(ht);
   int new_capacity = ht->capacity;
+
+  printf("%s\n", hash_table_retrieve(ht, "key-1"));
+  printf("%s\n", hash_table_retrieve(ht, "key-2"));
+  printf("%s\n", hash_table_retrieve(ht, "key-7"));
 
   printf("\nResizing hash table from %d to %d.\n", old_capacity, new_capacity);
 
